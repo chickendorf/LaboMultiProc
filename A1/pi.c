@@ -36,27 +36,20 @@ int main (int argc, const char *argv[]) {
 
 double calculate_pi (int num_threads, int samples) {
 	omp_set_num_threads(num_threads);
-    double pi;
 
 	int pointsIn = 0;
+  rand_gen rand = init_rand();
+  float x, y;
 
-    rand_gen rand = init_rand();
-    
-    #pragma omp parallel for
-    for(int i=0;i<samples;i++){
-		float x=next_rand(rand);
-		float y=next_rand(rand);
-		//printf("x : %f - y : %f\n",x,y);
-		
-		if(x*x+y*y <= 1){
-			pointsIn++;
-			//printf("x : %f - y : %f ---- %i - %d\n",x,y,i,pointsIn);
-		}
-	}
-	
-	return ((float)pointsIn)/((float)samples)*4.0;
-    
-    //printf("%f\n", next_rand(rand));
+  #pragma omp parallel for private(x, y) reduction(+:pointsIn)
+  for(int i=0;i<samples;i++){
+    x = next_rand(rand);
+    y = next_rand(rand);
 
-    return pi;
+		if(x*x + y*y <= 1){
+		    pointsIn++;
+		 }
+	 }
+
+	return 4*((float)pointsIn)/samples;
 }
