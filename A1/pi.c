@@ -1,8 +1,8 @@
 /*
 ============================================================================
 Filename    : pi.c
-Author      : Your names goes here
-SCIPER		: Your SCIPER numbers
+Author      : Arthur Vernet, Simon Maulini
+SCIPER		: 245828, ??????
 ============================================================================
 */
 
@@ -39,7 +39,7 @@ double calculate_pi (int num_threads, int samples) {
 
 	int pointsIn = 0;
   rand_gen rand = init_rand();
-  float x, y;
+  double x, y;
 
   #pragma omp parallel for private(x, y) reduction(+:pointsIn)
   for(int i=0;i<samples;i++){
@@ -51,5 +51,5 @@ double calculate_pi (int num_threads, int samples) {
 		 }
 	 }
 
-	return 4*((float)pointsIn)/samples;
+	return 4*((double)pointsIn)/samples;
 }

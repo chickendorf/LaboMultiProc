@@ -1,8 +1,8 @@
 /*
 ============================================================================
 Filename    : function.c
-Author      : Your names goes here
-SCIPER		: Your SCIPER numbers
+Author      : Arthur Vernet, Simon Maulini
+SCIPER		: 245828, ??????
 ============================================================================
 */
 

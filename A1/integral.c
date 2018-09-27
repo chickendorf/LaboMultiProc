@@ -1,8 +1,8 @@
 /*
 ============================================================================
 Filename    : integral.c
-Author      : Your names goes here
-SCIPER		: Your SCIPER numbers
+Author      : Arthur Vernet, Simon Maulini
+SCIPER		: 245828, ??????
 ============================================================================
 */
 
@@ -40,9 +40,18 @@ int main (int argc, const char *argv[]) {
 
 
 double integrate (int num_threads, int samples, int a, int b, double (*f)(double)) {
-    double integral;
+    double height, x;
 
-    /* Your code goes here */
+    double area = 0;
+    double width = b-a;
+    rand_gen rand = init_rand();
 
-    return integral;
+    #pragma omp parallel for private(x, height) reduction(+:area)
+    for(int i = 0; i< samples; i++){
+      x = next_rand(rand)*(width)+a;
+      height = f(x);
+      area += (height*width);
+    }
+
+    return area/samples;
 }
