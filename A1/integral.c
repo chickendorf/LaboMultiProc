@@ -43,14 +43,17 @@ double integrate (int num_threads, int samples, int a, int b, double (*f)(double
     double height, x;
 
     double area = 0;
-    double width = b-a;
-    rand_gen rand = init_rand();
+    double width = b - a;
 
-    #pragma omp parallel for private(x, height) reduction(+:area)
-    for(int i = 0; i< samples; i++){
-      x = next_rand(rand)*(width)+a;
-      height = f(x);
-      area += (height*width);
+    #pragma omp parallel
+    {
+      rand_gen rand = init_rand();
+      #pragma omp for private(x, height) reduction(+:area)
+      for(int i = 0; i < samples; i++){
+        x = next_rand(rand)*(width) + a;
+        height = f(x);
+        area += (height*width);
+      }
     }
 
     return area/samples;
