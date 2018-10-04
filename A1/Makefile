@@ -1,4 +1,3 @@
-
 CC = gcc-8
 CFLAGS = -std=gnu99 -O3 -fopenmp -Wall
 
