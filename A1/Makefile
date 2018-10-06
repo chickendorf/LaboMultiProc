@@ -11,7 +11,6 @@ integral: integral.c function.o utility.h
 
 test: omp_hello.c
 	$(CC) $(CFLAGS) $< -o $@
-	./test
 
 clean:
 	rm -f pi integral function.o test
