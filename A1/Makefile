@@ -1,5 +1,4 @@
-
-CC = gcc
+CC = gcc-8
 CFLAGS = -std=gnu99 -O3 -fopenmp -Wall
 
 all: pi integral test
@@ -12,7 +11,6 @@ integral: integral.c function.o utility.h
 
 test: omp_hello.c
 	$(CC) $(CFLAGS) $< -o $@
-	./test
 
 clean:
 	rm -f pi integral function.o test

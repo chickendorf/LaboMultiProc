@@ -40,20 +40,23 @@ int main (int argc, const char *argv[]) {
 
 
 double integrate (int num_threads, int samples, int a, int b, double (*f)(double)) {
+    omp_set_num_threads(num_threads);
+
     double height, x;
 
-    double area = 0;
     double width = b - a;
+    double area = 0;
 
-    #pragma omp parallel
+    #pragma omp parallel private(x, height)
     {
       rand_gen rand = init_rand();
-      #pragma omp for private(x, height) reduction(+:area)
+      #pragma omp for reduction(+:area)
       for(int i = 0; i < samples; i++){
         x = next_rand(rand)*(width) + a;
         height = f(x);
         area += (height*width);
       }
+      free_rand(rand);
     }
 
     return area/samples;
