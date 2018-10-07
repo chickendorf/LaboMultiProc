@@ -41,10 +41,10 @@ double calculate_pi (int num_threads, int samples) {
 
   int pointsIn = 0;
 
-  #pragma omp parallel
+  #pragma omp parallel private(x, y)
   {
     rand_gen rand = init_rand();
-    #pragma omp for private(x, y) reduction(+:pointsIn)
+    #pragma omp for reduction(+:pointsIn)
     for(int i = 0; i < samples; i++){
       x = next_rand(rand);
       y = next_rand(rand);
