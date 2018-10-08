@@ -10,4 +10,3 @@ echo STARTING AT `date`
 ./integral 64 1000000000 5 9
 
 echo FINISHED at `date`
-
