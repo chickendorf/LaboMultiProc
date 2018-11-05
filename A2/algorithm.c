@@ -1,8 +1,8 @@
 /*
 ============================================================================
 Filename    : algorithm.c
-Author      : Your names go here
-SCIPER      : Your SCIPER numbers
+Author      : Simon MAULINI & Arthur VERNET
+SCIPER      : 248115 & XXXXXX
 
 ============================================================================
 */
@@ -16,34 +16,40 @@ void simulate(double *input, double *output, int threads, int length, int iterat
     double *temp;
 	
 	int stepSize = length / threads;
+	int endX, endY, tmpX, tmpY, stepY, stepX, x, y;
+	double tmpVal;
 	
 	omp_set_num_threads(threads);
     
-    // Parallelize this!!
     for(int n=0; n < iterations; n++)
     {
 		#pragma omp parallel for collapse(2)
-		for(int stepY = 0; stepY < length; stepY += stepSize){
-			for(int stepX = 0; stepX < length; stepX += stepSize){
-				int endX = stepX + stepSize;
-				endX = (endX > length - 1) ? length-1 : endX;
+		for(stepY = 0; stepY < length; stepY += stepSize){
+			for(stepX = 0; stepX < length; stepX += stepSize){
 				
-				int endY = stepY + stepSize;
+				//Check if the end of the step is out of bound
+				endX = stepX + stepSize;
+				endX = (endX > length - 1) ? length-1 : endX;
+				endY = stepY + stepSize;
 				endY = (endY > length - 1) ? length-1 : endY;
 				
-				int tmpY = (stepY == 0) ? 1 : stepY;
-				int tmpX = (stepX == 0) ? 1 : stepX;
+				//Ignore the 0 coordonates
+				tmpY = (stepY == 0) ? 1 : stepY;
+				tmpX = (stepX == 0) ? 1 : stepX;
 				
-				for(int y = tmpY; y < endY; y++){
-					for(int x = tmpX; x < endX; x++){
+				for(y = tmpY; y < endY; y++){
+					for(x = tmpX; x < endX; x++){
 						if (((x == length/2-1) || (x== length/2)) && ((y == length/2-1) || (y == length/2))){
 							continue;
 						}
-
-						//OUTPUT(x,y) = (INPUT(x-1,y-1) + INPUT(x-1,y) + INPUT(x-1,y+1) +
-						OUTPUT(x,y) = (INPUT(x-1,y-1) + INPUT(x-1,y) + INPUT(x-1,y+1) +
-                                   INPUT(x,y-1)   + INPUT(x,y)   + INPUT(x,y+1)   +
-                                   INPUT(x+1,y-1) + INPUT(x+1,y) + INPUT(x+1,y+1))/9.0;
+						
+						//We slit the initial one line instruction to
+						// multiple line to be more readable
+						tmpVal = 0.0;
+						tmpVal += INPUT(x-1,y-1) + INPUT(x-1,y) + INPUT(x-1,y+1);
+						tmpVal += INPUT(x,y-1)   + INPUT(x,y)   + INPUT(x,y+1);
+						tmpVal += INPUT(x+1,y-1) + INPUT(x+1,y) + INPUT(x+1,y+1);
+						OUTPUT(x,y) = tmpVal/9.0;
 					}
 				}
 			}
