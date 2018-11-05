@@ -31,22 +31,16 @@ void simulate(double *input, double *output, int threads, int length, int iterat
 				int endY = stepY + stepSize;
 				endY = (endY > length - 1) ? length-1 : endY;
 				
-				stepY = (stepY == 0) ? 1 : stepY;
-				stepX = (stepX == 0) ? 1 : stepX;
+				int tmpY = (stepY == 0) ? 1 : stepY;
+				int tmpX = (stepX == 0) ? 1 : stepX;
 				
-				//printf("Step : (%d,%d)\n", stepX, stepY);
-				
-				for(int y = stepY; y < endY; y++){
-					for(int x = stepX; x < endX; x++){
+				for(int y = tmpY; y < endY; y++){
+					for(int x = tmpX; x < endX; x++){
 						if (((x == length/2-1) || (x== length/2)) && ((y == length/2-1) || (y == length/2))){
 							continue;
 						}
-						
-						/*OUTPUT(length/2-1,length/2-1) = INIT_VALUE;
-						OUTPUT(length/2-1,length/2)   = INIT_VALUE;
-						OUTPUT(length/2,length/2-1)   = INIT_VALUE;
-						OUTPUT(length/2,length/2)     = INIT_VALUE;*/
 
+						//OUTPUT(x,y) = (INPUT(x-1,y-1) + INPUT(x-1,y) + INPUT(x-1,y+1) +
 						OUTPUT(x,y) = (INPUT(x-1,y-1) + INPUT(x-1,y) + INPUT(x-1,y+1) +
                                    INPUT(x,y-1)   + INPUT(x,y)   + INPUT(x,y+1)   +
                                    INPUT(x+1,y-1) + INPUT(x+1,y) + INPUT(x+1,y+1))/9.0;
