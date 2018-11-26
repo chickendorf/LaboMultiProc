@@ -40,8 +40,8 @@ int main (int argc, const char *argv[]) {
   for(int i = 100; i > 0; i--){
     insert(head, i);
   }
-  printf("%d\n", search(head, 50));
-  delete(head, 50);
-  printf("%d\n", search(head, 50));
+  printf("%d\n", search(head, 5));
+  delete(head, 22);
+  printf("%d\n", search(head, 5));
   print_list(head);
 }

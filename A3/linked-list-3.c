@@ -16,8 +16,10 @@ int insert(node_t *head, int val) {
   while (current && current->val < val) {
     previous = current;
     omp_set_lock(previous->lock);
+      //printf("locked %d\n", previous->val);
     current  = current->next;
     omp_unset_lock(previous->lock);
+    //    printf("unlocked %d\n", previous->val);
   }
 
   if (current && current->val == val) { // This value already exists!
@@ -33,6 +35,7 @@ int insert(node_t *head, int val) {
   omp_lock_t lock;
   new_node->lock = &lock;
   omp_init_lock(new_node->lock);
+  //printf("init %d\n", new_node->val);
   previous->next = new_node;
   return 0;
 }
@@ -50,30 +53,19 @@ int delete(node_t *head, int val) {
   current = head->next;
   while (current) {
     omp_set_lock(current->lock);
-    printf("locked %d\n", current->val);
-
-    printf("trying to lock %d\n", previous->val);
-    omp_set_lock(previous->lock);
-    printf("locked %d\n", previous->val);
-
     if (current->val == val) {
       previous->next = current->next;
       current->to_remove = 1; // Another system component will free this node later
       omp_unset_lock(current->lock);
       omp_destroy_lock(current->lock);
-      omp_unset_lock(previous->lock);
       return val;
     }
 
-    node_t *tmp = previous;
     previous = current;
     current  = current->next;
-
-    omp_unset_lock(tmp->lock);
-    printf("unlocked %d\n", tmp->val);
     omp_unset_lock(previous->lock);
-    printf("unlocked %d\n", previous->val);
   }
+
   return -1;
 }
 
