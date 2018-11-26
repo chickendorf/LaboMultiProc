@@ -34,5 +34,8 @@ int main (int argc, const char *argv[]) {
   for(int i = 100; i > 0; i--){
     insert(list, i);
   }
+  printf("%d\n", search(list, 50));
+  delete(list, 50);
+  printf("%d\n", search(list, 50));
   print_list(list);
 }
