@@ -16,10 +16,8 @@ int insert(node_t *head, int val) {
   while (current && current->val < val) {
     previous = current;
     omp_set_lock(previous->lock);
-      //printf("locked %d\n", previous->val);
     current  = current->next;
     omp_unset_lock(previous->lock);
-    //    printf("unlocked %d\n", previous->val);
   }
 
   if (current && current->val == val) { // This value already exists!
@@ -35,7 +33,6 @@ int insert(node_t *head, int val) {
   omp_lock_t lock;
   new_node->lock = &lock;
   omp_init_lock(new_node->lock);
-  //printf("init %d\n", new_node->val);
   previous->next = new_node;
   return 0;
 }

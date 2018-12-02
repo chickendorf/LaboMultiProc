@@ -20,7 +20,7 @@ int main (int argc, const char *argv[]) {
   int threads;
 
   if (argc != 2) {
-    printf("Invalid input! \nUsage: ./assignment3 <threads>\n");
+    printf("Invalid input! \nUsage: ./assignment3_3 <threads>\n");
     return 1;
   } else {
     threads = atoi(argv[1]);
@@ -37,11 +37,11 @@ int main (int argc, const char *argv[]) {
   omp_init_lock(head->lock);
 
   #pragma omp for schedule(static)
-  for(int i = 100; i > 0; i--){
+  for(int i = 50; i > 0; i--){
     insert(head, i);
+    int r = rand()%50;
+    printf("delete %d\n", r);
+    delete(head, r);
+    print_list(head);
   }
-  printf("%d\n", search(head, 5));
-  delete(head, 22);
-  printf("%d\n", search(head, 5));
-  print_list(head);
 }
