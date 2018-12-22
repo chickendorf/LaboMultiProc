@@ -1,8 +1,8 @@
 /*
 ============================================================================
 Filename    : algorithm.c
-Author      : Your name goes here
-SCIPER      : Your SCIPER number
+Author      : Arthur Vernet, Simon Maulini
+SCIPER      : 245828, 248115
 ============================================================================
 */
 
@@ -60,24 +60,43 @@ void GPU_array_process(double *input, double *output, int length, int iterations
     cudaEventCreate(&comp_end);
 
     /* Preprocessing goes here */
+    cudaSetDevice(0);
+    size_t size = length*length*sizeof(double);
+    double* data;
+
+    // allocate array on device
+  	if (cudaMalloc((void **) &data, size) != cudaSuccess)
+  		cout << "error in cudaMalloc" << endl;
 
     cudaEventRecord(cpy_H2D_start);
+
     /* Copying array from host to device goes here */
+    if (cudaMemcpy(data, input, size, cudaMemcpyHostToDevice) != cudaSuccess)
+      cout << "error in cudaMemcpy" << endl;
+
     cudaEventRecord(cpy_H2D_end);
     cudaEventSynchronize(cpy_H2D_end);
 
-    //Copy array from host to device
     cudaEventRecord(comp_start);
     /* GPU calculation goes here */
+
+
+
+
     cudaEventRecord(comp_end);
     cudaEventSynchronize(comp_end);
 
     cudaEventRecord(cpy_D2H_start);
+
     /* Copying array from device to host goes here */
+    if(cudaMemcpy(output, data, size, cudaMemcpyDeviceToHost) != cudaSuccess)
+      cout << "Cuda Memcpy DeviceToHost Error: cannot copy output\n";
+
     cudaEventRecord(cpy_D2H_end);
     cudaEventSynchronize(cpy_D2H_end);
 
     /* Postprocessing goes here */
+    cudaFree(data);
 
     float time;
     cudaEventElapsedTime(&time, cpy_H2D_start, cpy_H2D_end);
