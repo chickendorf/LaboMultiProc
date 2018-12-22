@@ -10,8 +10,8 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 
-length=10
-iterations=1
+length=1000
+iterations=10000
 
 module load gcc cuda
 

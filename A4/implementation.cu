@@ -46,6 +46,36 @@ void array_process(double *input, double *output, int length, int iterations)
     }
 }
 
+__global__ void kernel_row(double *input, double *output, int length) {
+  int x = blockDim.x * blockIdx.x + threadIdx.x;
+  int y = blockDim.y * blockIdx.y + threadIdx.y;
+  int i = y * length + x;
+
+  //check if the coordinates are out of bounds or corresponding to the heat core
+  if(x >= length || y >= length || x == 0 || x == length - 1 || (y == length / 2 || y == length / 2 - 1)
+    && (x == length / 2 - 1 || x == length / 2))
+    return;
+
+  output[i] = input[i];
+  output[i] += input[i - 1];
+  output[i] += input[i + 1];
+}
+
+__global__ void kernel_column(double *input, double *output, int length) {
+  int x = blockDim.x * blockIdx.x + threadIdx.x;
+  int y = blockDim.y * blockIdx.y + threadIdx.y;
+  int i = y * length + x;
+
+  //check if the coordinates are out of bounds or corresponding to the heat core
+  if(x >= length || y >= length || y == 0 || y == length - 1 || (y == length / 2 || y == length / 2 - 1)
+    && (x == length / 2 - 1 || x == length / 2))
+    return;
+
+  output[i] = input[i];
+  output[i] += input[i - length];
+  output[i] += input[i + length];
+  output[i] /= 9; //divide by 9 as this kernel is called the last
+}
 
 // GPU Optimized function
 void GPU_array_process(double *input, double *output, int length, int iterations)
@@ -62,26 +92,35 @@ void GPU_array_process(double *input, double *output, int length, int iterations
     /* Preprocessing goes here */
     cudaSetDevice(0);
     size_t size = length*length*sizeof(double);
-    double* data;
+    double* input_data;
+    double* output_data;
+
+    dim3 threadPerBlocks(32, 32);
+    dim3 blocks(4, 4);
 
     // allocate array on device
-  	if (cudaMalloc((void **) &data, size) != cudaSuccess)
+  	if (cudaMalloc((void **) &input_data, size) != cudaSuccess)
   		cout << "error in cudaMalloc" << endl;
+    if (cudaMalloc((void **) &output_data, size) != cudaSuccess)
+      cout << "error in cudaMalloc" << endl;
 
     cudaEventRecord(cpy_H2D_start);
 
     /* Copying array from host to device goes here */
-    if (cudaMemcpy(data, input, size, cudaMemcpyHostToDevice) != cudaSuccess)
+    if (cudaMemcpy(input_data, input, size, cudaMemcpyHostToDevice) != cudaSuccess)
       cout << "error in cudaMemcpy" << endl;
 
     cudaEventRecord(cpy_H2D_end);
     cudaEventSynchronize(cpy_H2D_end);
 
     cudaEventRecord(comp_start);
+
     /* GPU calculation goes here */
-
-
-
+    for(int i = 0; i < iterations; ++i) {
+      kernel_row <<< blocks, threadPerBlocks >>> (input_data, output_data, length);
+      kernel_column <<< blocks, threadPerBlocks >>> (output_data, input_data, length);
+      cudaThreadSynchronize(); //synchronize at every iterations, works as a barrier
+    }
 
     cudaEventRecord(comp_end);
     cudaEventSynchronize(comp_end);
@@ -89,14 +128,15 @@ void GPU_array_process(double *input, double *output, int length, int iterations
     cudaEventRecord(cpy_D2H_start);
 
     /* Copying array from device to host goes here */
-    if(cudaMemcpy(output, data, size, cudaMemcpyDeviceToHost) != cudaSuccess)
+    if(cudaMemcpy(output, output_data, size, cudaMemcpyDeviceToHost) != cudaSuccess)
       cout << "Cuda Memcpy DeviceToHost Error: cannot copy output\n";
 
     cudaEventRecord(cpy_D2H_end);
     cudaEventSynchronize(cpy_D2H_end);
 
     /* Postprocessing goes here */
-    cudaFree(data);
+    cudaFree(input_data);
+    cudaFree(output_data);
 
     float time;
     cudaEventElapsedTime(&time, cpy_H2D_start, cpy_H2D_end);

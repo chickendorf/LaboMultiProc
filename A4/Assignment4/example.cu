@@ -1,4 +1,4 @@
-/* 
+/*
  *
  *  CUDA Example
  *
@@ -38,7 +38,7 @@ int main(void)
 
 	cudaSetDevice(0);
 
-	// allocate array on device 
+	// allocate array on device
 	if (cudaMalloc((void **) &a_d, size) != cudaSuccess)
 		cout << "error in cudaMalloc" << endl;
 
@@ -64,9 +64,9 @@ int main(void)
 	for (i=0; i<N; i++) assert(a_h[i] == b_h[i]);
 
 	// cleanup
-	free(a_h); 
+	free(a_h);
 	free(b_h);
-	cudaFree(a_d); 
+	cudaFree(a_d);
 
 	return 0;
 }
